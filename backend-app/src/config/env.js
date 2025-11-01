@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config({
-  quiet: trues,
+  quiet: true,
 });
 
 export const NODE_ENV = process.env.NODE_ENV;
