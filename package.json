@@ -1,0 +1,13 @@
+{
+  "name": "fullstack-calls",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run start --prefix backend-app",
+    "build": "npm install --prefix backend-app && npm install --prefix frontend-app && npm run build --prefix frontend-app"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
