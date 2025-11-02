@@ -10,17 +10,84 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import logger from './config/logger.js';
 import rateLimiter from './middleware/rateLimiter.js';
+import { createCSPMiddleware } from './middleware/csp.js';
 // JWT auth routes removed - using Clerk authentication
 import userRoutes from './routes/user.js';
+import testRoutes from './routes/test.js';
 import webhookRoutes from './routes/webhook.js';
 import swagger from './swagger.js';
 import { CLIENT_URL } from './config/env.js';
 
 const app = express();
 
-// middlewares
-app.use(helmet());
-app.use(cors({ origin: CLIENT_URL, credentials: true }));
+// middlewares - Configure helmet for Clerk compatibility
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'", 'https:'],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'",
+          'https://*.clerk.accounts.dev',
+          'https://*.clerk.com',
+          'https://challenges.cloudflare.com',
+          'https://cdn.jsdelivr.net',
+          'https://unpkg.com',
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          'https://fonts.googleapis.com',
+          'https://*.clerk.accounts.dev',
+          'https://*.clerk.com',
+        ],
+        fontSrc: [
+          "'self'",
+          'https://fonts.gstatic.com',
+          'https://*.clerk.accounts.dev',
+          'https://*.clerk.com',
+        ],
+        imgSrc: [
+          "'self'",
+          'data:',
+          'https://*.clerk.com',
+          'https://*.clerk.accounts.dev',
+          'https://img.clerk.com',
+        ],
+        connectSrc: [
+          "'self'",
+          'https://*.clerk.accounts.dev',
+          'https://*.clerk.com',
+          'https://api.clerk.com',
+          'https://clerk.accounts.dev',
+        ],
+        frameSrc: [
+          'https://challenges.cloudflare.com',
+          'https://*.clerk.accounts.dev',
+          'https://*.clerk.com',
+        ],
+        workerSrc: ["'self'", 'blob:'],
+        childSrc: [
+          "'self'",
+          'https://*.clerk.accounts.dev',
+          'https://*.clerk.com',
+        ],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Disable for Clerk compatibility
+  })
+);
+
+app.use(
+  cors({
+    origin: [CLIENT_URL, 'https://*.clerk.accounts.dev', 'https://*.clerk.com'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  })
+);
 app.use(morgan('combined', { stream: logger.stream }));
 
 // Webhook routes (before JSON parsing for raw body access)
@@ -40,6 +107,7 @@ app.use('/uploads', express.static('uploads'));
 // routes
 // JWT auth routes removed - using Clerk authentication
 app.use('/api/users', userRoutes);
+app.use('/api/test', testRoutes);
 
 // swagger
 app.use('/api-docs', swagger.router);
