@@ -21,6 +21,12 @@ export const ClerkProvider = ({ children }: ClerkProviderProps) => {
           colorPrimary: "#000000",
         },
       }}
+      // Add allowed redirect origins for better compatibility
+      allowedRedirectOrigins={[
+        window.location.origin,
+        // Add your production domain here
+        // 'https://your-production-domain.com'
+      ]}
     >
       {children}
     </BaseClerkProvider>
