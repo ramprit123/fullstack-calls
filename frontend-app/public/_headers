@@ -1,7 +1,4 @@
-# Sevalla Cloud Headers Configuration
+# Ultra-permissive headers for debugging CSP issues
 /*
-  Content-Security-Policy: default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; style-src 'self' 'unsafe-inline' https: data:; font-src 'self' https: data:; img-src 'self' https: data: blob:; connect-src 'self' https: wss: data:; frame-src 'self' https:; worker-src 'self' blob:; child-src 'self' https: blob:; object-src 'none'; base-uri 'self';
-  X-Frame-Options: SAMEORIGIN
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline' data:; img-src * data: blob:; font-src * data:; connect-src * data: blob:; frame-src *; worker-src * blob:; child-src * blob:;
+  X-Frame-Options: ALLOWALL
