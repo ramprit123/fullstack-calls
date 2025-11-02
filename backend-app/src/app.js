@@ -12,7 +12,6 @@ import logger from './config/logger.js';
 import rateLimiter from './middleware/rateLimiter.js';
 // JWT auth routes removed - using Clerk authentication
 import userRoutes from './routes/user.js';
-import testRoutes from './routes/test.js';
 import webhookRoutes from './routes/webhook.js';
 import swagger from './swagger.js';
 
@@ -40,7 +39,6 @@ app.use('/uploads', express.static('uploads'));
 // routes
 // JWT auth routes removed - using Clerk authentication
 app.use('/api/users', userRoutes);
-app.use('/api/test', testRoutes);
 
 // swagger
 app.use('/api-docs', swagger.router);
