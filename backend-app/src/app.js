@@ -14,12 +14,13 @@ import rateLimiter from './middleware/rateLimiter.js';
 import userRoutes from './routes/user.js';
 import webhookRoutes from './routes/webhook.js';
 import swagger from './swagger.js';
+import { CLIENT_URL } from './config/env.js';
 
 const app = express();
 
 // middlewares
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(morgan('combined', { stream: logger.stream }));
 
 // Webhook routes (before JSON parsing for raw body access)

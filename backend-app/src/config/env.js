@@ -14,3 +14,4 @@ export const EMAIL_PORT = process.env.EMAIL_PORT;
 export const EMAIL_USER = process.env.EMAIL_USER;
 export const EMAIL_PASS = process.env.EMAIL_PASS;
 export const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+export const CLIENT_URL = process.env.CLIENT_URL;
