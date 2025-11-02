@@ -1,83 +1,48 @@
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
-export class ApiError extends Error {
-  status: number;
-  response?: Response;
-
-  constructor(message: string, status: number, response?: Response) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-    this.response = response;
-  }
-}
-
-interface ApiRequestOptions extends RequestInit {
-  token?: string;
-}
-
-export const apiRequest = async <T>(
-  endpoint: string,
-  options: ApiRequestOptions = {}
-): Promise<T> => {
-  const { token, ...fetchOptions } = options;
-
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const headers: Record<string, string> = {
+// Create axios instance
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
     "Content-Type": "application/json",
-  };
+  },
+});
 
-  // Merge existing headers
-  if (fetchOptions.headers) {
-    const existingHeaders = new Headers(fetchOptions.headers);
-    existingHeaders.forEach((value, key) => {
-      headers[key] = value;
-    });
-  }
+// Custom hook to get authenticated API instance
+export const useAuthenticatedApi = () => {
+  const { getToken } = useAuth();
 
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  const response = await fetch(url, {
-    ...fetchOptions,
-    headers,
+  const authenticatedApi = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
-  if (!response.ok) {
-    const errorMessage = `HTTP error! status: ${response.status}`;
-    throw new ApiError(errorMessage, response.status, response);
-  }
+  // Add request interceptor to include auth token
+  authenticatedApi.interceptors.request.use(
+    async (config) => {
+      try {
+        const token = await getToken();
+        if (token) {
+          config.headers = config.headers || {};
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error("Failed to get auth token:", error);
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    return response.json();
-  }
-
-  return response.text() as T;
+  return authenticatedApi;
 };
 
-// Convenience methods
-export const api = {
-  get: <T>(endpoint: string, token?: string) =>
-    apiRequest<T>(endpoint, { method: "GET", token }),
-
-  post: <T>(endpoint: string, data?: any, token?: string) =>
-    apiRequest<T>(endpoint, {
-      method: "POST",
-      body: data ? JSON.stringify(data) : undefined,
-      token,
-    }),
-
-  put: <T>(endpoint: string, data?: any, token?: string) =>
-    apiRequest<T>(endpoint, {
-      method: "PUT",
-      body: data ? JSON.stringify(data) : undefined,
-      token,
-    }),
-
-  delete: <T>(endpoint: string, token?: string) =>
-    apiRequest<T>(endpoint, { method: "DELETE", token }),
-};
+export default api;

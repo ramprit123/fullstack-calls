@@ -1,9 +1,14 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useApi } from "@/hooks/useApi";
 import { ProtectedRoute, UserButton } from "@/components/auth";
+import { TestApi } from "@/components/TestApi";
+import { UserProfile } from "@/components/UserProfile";
 import { SignIn } from "@clerk/clerk-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { useProfile } = useApi();
+  const { data: profile, isLoading } = useProfile();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -20,8 +25,33 @@ const Dashboard = () => {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-            <p className="text-gray-500">Your protected content goes here</p>
+          <div className="space-y-6">
+            <div className="border-4 border-dashed border-gray-200 rounded-lg p-6">
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-500 mb-4">
+                    Your protected content goes here
+                  </p>
+                  {profile && (
+                    <div className="text-sm text-gray-600">
+                      <p>
+                        Backend Profile: {profile.firstName} {profile.lastName}
+                      </p>
+                      <p>Email: {profile.email}</p>
+                      <p>Role: {profile.role}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <TestApi />
+
+            <UserProfile />
           </div>
         </div>
       </main>

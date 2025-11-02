@@ -12,7 +12,10 @@ interface UserProfile {
 export const useUserProfile = () => {
   return useAuthenticatedQuery<UserProfile>({
     queryKey: ["user", "profile"],
-    queryFn: (token) => api.get<UserProfile>("/user/profile", token),
+    queryFn: async (token: any) => {
+      const response = await api.get<UserProfile>("/user/profile", token);
+      return response.data;
+    },
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

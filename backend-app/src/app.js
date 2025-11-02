@@ -10,25 +10,37 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import logger from './config/logger.js';
 import rateLimiter from './middleware/rateLimiter.js';
-import authRoutes from './routes/auth.js';
+// JWT auth routes removed - using Clerk authentication
 import userRoutes from './routes/user.js';
+import testRoutes from './routes/test.js';
+import webhookRoutes from './routes/webhook.js';
 import swagger from './swagger.js';
 
 const app = express();
 
 // middlewares
 app.use(helmet());
+app.use(cors({ origin: true, credentials: true }));
+app.use(morgan('combined', { stream: logger.stream }));
+
+// Webhook routes (before JSON parsing for raw body access)
+app.use(
+  '/api/webhooks',
+  express.raw({ type: 'application/json' }),
+  webhookRoutes
+);
+
+// Regular middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: true, credentials: true }));
-app.use(morgan('combined', { stream: logger.stream }));
 app.use(rateLimiter);
 app.use('/uploads', express.static('uploads'));
 
 // routes
-app.use('/api/auth', authRoutes);
+// JWT auth routes removed - using Clerk authentication
 app.use('/api/users', userRoutes);
+app.use('/api/test', testRoutes);
 
 // swagger
 app.use('/api-docs', swagger.router);

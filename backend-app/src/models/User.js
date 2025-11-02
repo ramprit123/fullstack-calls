@@ -1,29 +1,37 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import AddressSchema from './Address.js';
 
 const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    clerkId: { type: String, required: true, unique: true }, // Clerk user ID
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    firstName: { type: String },
+    lastName: { type: String },
+    username: { type: String },
     profileImage: String,
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     address: AddressSchema,
-    refreshToken: String,
+    isActive: { type: Boolean, default: true },
+    lastLoginAt: { type: Date },
+    // Additional fields for your app
+    preferences: {
+      theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+      notifications: { type: Boolean, default: true },
+    },
   },
   { timestamps: true }
 );
 
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+// Index for faster queries
+UserSchema.index({ clerkId: 1 });
+UserSchema.index({ email: 1 });
+
+// Virtual for full name
+UserSchema.virtual('fullName').get(function () {
+  return `${this.firstName || ''} ${this.lastName || ''}`.trim();
 });
 
-UserSchema.methods.comparePassword = function (pw) {
-  return bcrypt.compare(pw, this.password);
-};
+// Ensure virtual fields are serialized
+UserSchema.set('toJSON', { virtuals: true });
 
 export default mongoose.model('User', UserSchema);
