@@ -1,7 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useApi } from "@/hooks/useApi";
 import { ProtectedRoute, UserButton } from "@/components/auth";
-import { TestApi } from "@/components/TestApi";
 import { UserProfile } from "@/components/UserProfile";
 import { SignIn } from "@clerk/clerk-react";
 
@@ -48,8 +47,6 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-
-            <TestApi />
 
             <UserProfile />
           </div>
