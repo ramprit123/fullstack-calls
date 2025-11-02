@@ -1,0 +1,4 @@
+# Ultra-permissive headers for debugging CSP issues
+/*
+  Content-Security-Policy: default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline' data:; img-src * data: blob:; font-src * data:; connect-src * data: blob:; frame-src *; worker-src * blob:; child-src * blob:;
+  X-Frame-Options: ALLOWALL
